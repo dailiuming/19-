@@ -22,9 +22,9 @@ var Game = function () {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 2, 1, 0, 0, 0],
-        [0, 0, 0, 2, 2, 2, 1, 0, 0, 0],
-        [0, 0, 1, 1, 1, 1, 1, 0, 0, 0]
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ]
 
     // 当前方块
@@ -68,8 +68,8 @@ var Game = function () {
     }
     // 检测数据合法
     var isValid = function (pos, data) {
-        for (let i = 0; i < data.length; i++) {
-            for (let j = 0; j < data[0].length; j++) {
+        for (var i = 0; i < data.length; i++) {
+            for (var j = 0; j < data[0].length; j++) {
                 if (data[i][j] !== 0) {
                     if (!check(pos, i, j)) {
                         return false
@@ -82,8 +82,8 @@ var Game = function () {
 
     // 清除数据
     var clearData = function () {
-        for (let i = 0; i < cur.data.length; i++) {
-            for (let j = 0; j < cur.data[0].length; j++) {
+        for (var i = 0; i < cur.data.length; i++) {
+            for (var j = 0; j < cur.data[0].length; j++) {
                 if (check(cur.origin, i, j)) {
                     gameData[cur.origin.x + i][cur.origin.y + j] = 0
                 }
@@ -93,8 +93,8 @@ var Game = function () {
 
     // 设置数据
     var setData = function () {
-        for (let i = 0; i < cur.data.length; i++) {
-            for (let j = 0; j < cur.data[0].length; j++) {
+        for (var i = 0; i < cur.data.length; i++) {
+            for (var j = 0; j < cur.data[0].length; j++) {
                 if (check(cur.origin, i, j)) {
                     gameData[cur.origin.x + i][cur.origin.y + j] = cur.data[i][j]
                 }
@@ -156,14 +156,63 @@ var Game = function () {
             refreshDiv(gameData, gameDivs)
         }
     }
+    // 不能下落时 变为1
+    var fixed = function () {
+        for (var i = 0; i < cur.data.length; i++) {
+            for (var j = 0; j < cur.data[0].length; j++) {
+                if (check(cur.origin, i, j)) {
+                    if (gameData[cur.origin.x + i][cur.origin.y + j] == 2) {
+                        gameData[cur.origin.x + i][cur.origin.y + j] = 1
+                    }
+                }
+            }
+        }
+        refreshDiv(gameData, gameDivs)
+    }
 
+    // 使用下一个方块
+    var performNext = function (type, dir) {
+        cur = next
+        setData()
+        next = SquareFactory.prototype.make(type, dir)
+        refreshDiv(gameData, gameDivs)
+        refreshDiv(next.data, nextDivs)
+    }
+    // 消除
+    var checkClear = function () {
+        for (var i = gameData.length - 1; i >= 0; i--) {
+            clear = true
+            for (var j = 0; j < gameData[0].length; j++) {
+                if (gameData[i][j] != 1) {
+                    clear = false
+                    break
+                }
+            }
+            if (clear) {
+                for (var m = i; m > 0; m--) {
+                    for (let n = 0; n < gameData[0].length; n++) {
+                        gameData[m][n] = gameData[m - 1][n]
+                    }
+                }
+                for (var n = 0; n > 0; n--) {
+                    for (let n = 0; n < gameData[0].length; n++) {
+                        gameData[0][n] = 0
+                    }
+                }
+                i++
+            }
+        }
+    }
+    // 判断游戏结束
+    var checkGameOver = function(){
 
+    }
     // 初始化
     var init = function (doms) {
         gameDiv = doms.gameDiv
         nextDiv = doms.nextDiv
         cur = SquareFactory.prototype.make(2, 2)
-        cur = SquareFactory.prototype.make(3, 3)
+        next = SquareFactory.prototype.make(3, 3)
         initDiv(gameDiv, gameData, gameDivs)
         initDiv(nextDiv, next.data, nextDivs)
         setData()
@@ -172,11 +221,15 @@ var Game = function () {
     }
 
     // 导出api
-    this.init = init
-    this.down = down
-    this.left = left
-    this.right = right
-    this.rotate = rotate
+    this.init = init    // 初始化
+    this.down = down    // 下移 down
+    this.left = left    // 坐移 left
+    this.right = right  // 右移 right
+    this.rotate = rotate    // 旋转 rotate
+    this.fixed = fixed  // 不能下落时 变为1
+    this.performNext = performNext  // 使用下一个方块
+    this.checkClear = checkClear  // 消除
+    this.checkGameOver = checkGameOver  // 游戏结束
     this.fall = function () {
         while (down());
     }

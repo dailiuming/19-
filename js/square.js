@@ -18,7 +18,6 @@ var Square = function () {
 
 // 下
 Square.prototype.canRotate = function (isValid) {
-    console.log('zzz');
     var d = (this.dir + 1) % 4
     var test = [
         [0, 0, 0, 0],
@@ -26,7 +25,6 @@ Square.prototype.canRotate = function (isValid) {
         [0, 0, 0, 0],
         [0, 0, 0, 0]
     ]
-    console.log('dddd', d);
     for (let i = 0; i < this.data.length; i++) {
         for (let j = 0; j < this.data[0].length; j++) {
             test[i][j] = this.rotates[d][i][j]

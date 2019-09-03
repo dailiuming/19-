@@ -1,6 +1,10 @@
 var Local = function () {
     // 游戏对象
     var game
+    // 下落速度
+    var INTERVAL = 200  //毫秒
+    // 定时器
+    var timer = null
     // 绑定键盘事件
     var bindKeyEvent = function () {
         document.onkeydown = function (e) {
@@ -17,6 +21,28 @@ var Local = function () {
             }
         }
     }
+    // 移动
+    var move = function () {
+        if (!game.down()) {
+            //判断到底部变色
+            game.fixed()
+            // 消除
+            game.checkClear()
+            // 游戏结束条件
+            game.checkGameOver()
+            // 重新再生成一个
+            game.performNext(generateType(), generateDir())
+
+        }
+    }
+    // 随机生产一个方块
+    var generateType = function () {
+        return Math.ceil(Math.random() * 7) - 1
+    }
+    // 随机生产一个方块
+    var generateDir = function () {
+        return Math.ceil(Math.random() * 4) - 1
+    }
     var start = function () {
         var doms = {
             gameDiv: document.getElementById('game'),
@@ -25,6 +51,7 @@ var Local = function () {
         game = new Game()
         game.init(doms)
         bindKeyEvent()
+        timer = setInterval(move, INTERVAL)
     }
     // 导出
     this.start = start
