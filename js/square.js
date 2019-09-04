@@ -15,7 +15,7 @@ var Square = function () {
     // 方向 
     this.dir = 0
 }
-
+Square()
 // 下
 Square.prototype.canRotate = function (isValid) {
     var d = (this.dir + 1) % 4
